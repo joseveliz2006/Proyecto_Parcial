@@ -1,312 +1,54 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resolución de Sistemas de Ecuaciones</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        :root {
-            --bg: #0e0e12;
-            --surface: #16161c;
-            --surface2: #1e1e28;
-            --border: #2a2a38;
-            --accent: #7c6cfa;
-            --accent2: #4ecdc4;
-            --text: #e8e8f0;
-            --muted: #6b6b80;
-            --success: #4ecdc4;
-            --error: #ff6b6b;
-            --mono: 'JetBrains Mono', monospace;
-            --sans: 'Syne', sans-serif;
-        }
+    <title>Proyecto Parcial</title>
 
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: var(--mono);
-            min-height: 100vh;
-            padding: 2rem 1rem;
-        }
 
-        h1 {
-            font-family: var(--sans);
-            font-size: clamp(1.4rem, 4vw, 2rem);
-            font-weight: 800;
-            text-align: center;
-            margin-bottom: 2rem;
-            letter-spacing: -0.02em;
-        }
-
-        h1 span { color: var(--accent); }
-
-        .container {
-            max-width: 820px;
-            margin: 0 auto;
-            display: grid;
-            gap: 1.5rem;
-        }
-
-        .panel {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-        }
-
-        .panel-title {
-            font-family: var(--sans);
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .panel-title::before {
-            content: '';
-            display: inline-block;
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: var(--accent);
-        }
-
-        /* Radio buttons */
-        .radio-group {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .radio-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            padding: 0.6rem 1.2rem;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            color: var(--muted);
-        }
-
-        .radio-label:has(input:checked) {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: rgba(124,108,250,0.08);
-        }
-
-        .radio-label input { display: none; }
-
-        /* Equation inputs */
-        #Variables { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
-
-        .ecuacion {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            font-size: 0.95rem;
-            color: var(--muted);
-        }
-
-        .ecuacion .eq-label {
-            font-family: var(--sans);
-            font-size: 0.75rem;
-            color: var(--accent2);
-            min-width: 24px;
-        }
-
-        .InputsV {
-            width: 60px;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 0.4rem 0.5rem;
-            color: var(--text);
-            font-family: var(--mono);
-            font-size: 0.9rem;
-            text-align: center;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .InputsV:focus { border-color: var(--accent); }
-        .InputsV.error { border-color: var(--error) !important; }
-
-        .var-name {
-            font-family: var(--sans);
-            font-weight: 600;
-            font-size: 1rem;
-            color: var(--accent);
-        }
-
-        .eq-sign { color: var(--muted); }
-
-        /* Select */
-        .select-wrap { margin-bottom: 1.5rem; }
-
-        select {
-            width: 100%;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0.65rem 1rem;
-            color: var(--text);
-            font-family: var(--mono);
-            font-size: 0.9rem;
-            outline: none;
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6b80' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            transition: border-color 0.2s;
-        }
-
-        select:focus { border-color: var(--accent); }
-
-        /* Submit button */
-        #resolver {
-            width: 100%;
-            padding: 0.8rem;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-family: var(--sans);
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            letter-spacing: 0.04em;
-            transition: opacity 0.2s, transform 0.1s;
-        }
-
-        #resolver:hover { opacity: 0.88; }
-        #resolver:active { transform: scale(0.98); }
-
-        /* Resultado */
-        #Resolucion { display: none; }
-
-        #Resolucion.visible { display: block; }
-
-        .res-step {
-            background: var(--surface2);
-            border-left: 3px solid var(--accent);
-            border-radius: 0 8px 8px 0;
-            padding: 1rem 1.25rem;
-            margin-bottom: 0.75rem;
-            font-size: 0.88rem;
-            line-height: 1.8;
-        }
-
-        .res-step .step-title {
-            font-family: var(--sans);
-            font-weight: 600;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--accent2);
-            margin-bottom: 0.4rem;
-        }
-
-        .res-final {
-            background: rgba(78,205,196,0.08);
-            border: 1px solid var(--accent2);
-            border-radius: 10px;
-            padding: 1.25rem;
-            margin-top: 1rem;
-            text-align: center;
-        }
-
-        .res-final .final-title {
-            font-family: var(--sans);
-            font-size: 0.75rem;
-            letter-spacing: 0.1em;
-            color: var(--accent2);
-            text-transform: uppercase;
-            margin-bottom: 0.75rem;
-        }
-
-        .res-values {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .res-val {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .res-val .val-name {
-            font-size: 0.8rem;
-            color: var(--muted);
-            font-family: var(--sans);
-        }
-
-        .res-val .val-num {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .no-solucion {
-            color: var(--error);
-            text-align: center;
-            padding: 1rem;
-            font-family: var(--sans);
-        }
-    </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Sistemas de <span>Ecuaciones</span></h1>
+    <head>
 
-    <div class="panel" id="Info">
+    </head>
+
+    <div id="Info">
+
         <form id="Form">
-            <p class="panel-title">Tipo de sistema</p>
-            <div class="radio-group">
-                <label class="radio-label">
-                    <input type="radio" name="Tipo" value="2" id="r2"> 2×2
-                </label>
-                <label class="radio-label">
-                    <input type="radio" name="Tipo" value="3" id="r3"> 3×3
-                </label>
-            </div>
+            <p> ¿Que tipo de sistema desea resolver?</p> <br>
+            <input type="radio" name="Tipo" value="2" id="2">
+            <label for="2"> 2x2</label>
+            <input type="radio" name="Tipo" value="3" id="3">
+            <label for="3">3x3</label> <br><br>
+            <span id="Variables">
+                   
+            </span>
+            <label for="opciones">Seleccione el metodo</label> <br><br>
+            <select name="opciones" id="opciones">
+                <option value="" disabled selected hidden>Selecciona un metodo...</option>
+                <span id="ListaOpt">
+                
+                </span>
 
-            <p class="panel-title">Ingresá los coeficientes</p>
-            <div id="Variables"></div>
+            </select>
+            <br><br>
+            <input type="submit" id="resolver">
 
-            <p class="panel-title">Método de resolución</p>
-            <div class="select-wrap">
-                <select name="opciones" id="ListaOpt">
-                    <option value="" disabled selected hidden>Seleccioná un método...</option>
-                </select>
-            </div>
-
-            <input type="submit" id="resolver" value="Resolver sistema →">
         </form>
-    </div>
 
-    <div class="panel" id="Resolucion">
-        <p class="panel-title">Proceso de resolución</p>
-        <div id="ResolucionContenido"></div>
     </div>
-</div>
+    <div id="Resolucion">
+        
+    </div>
+    
 
-<script src="logica.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.all.min.js"></script>
+    <script src="logica.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.all.min.js"></script>
+
 </body>
 </html>
+
+
+
