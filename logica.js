@@ -80,6 +80,7 @@ radios.forEach(radio => {
 
             listaOpt.innerHTML = `
                 <option value="" disabled selected hidden>Seleccioná un método...</option>
+                <option value="E3">Eliminación</option>
                 <option value="GS">Gauss Simple</option>
                 <option value="GJ">Gauss-Jordan</option>`;
         }
@@ -154,8 +155,92 @@ function resolver2x2(d, metodo) {
 
 // ─── Despachar método 3x3 ─────────────────────────────────────────────────────
 function resolver3x3(d, metodo) {
-    if (metodo === "GS")     metodoGaussSimple(d);
+    if (metodo === "E3")      metodoEliminacion3x3(d);
+    else if (metodo === "GS") metodoGaussSimple(d);
     else if (metodo === "GJ") metodoGaussJordan(d);
+}
+
+// ── Eliminación 3x3 ───────────────────────────────────────────────────────────
+function metodoEliminacion3x3(d) {
+    const pasos = [];
+    const { x1, y1, z1, n1, x2, y2, z2, n2, x3, y3, z3, n3 } = d;
+
+    pasos.push({
+        titulo: "Sistema original",
+        texto: `E1: ${fmt(x1)}X + ${fmt(y1)}Y + ${fmt(z1)}Z = ${fmt(n1)}\nE2: ${fmt(x2)}X + ${fmt(y2)}Y + ${fmt(z2)}Z = ${fmt(n2)}\nE3: ${fmt(x3)}X + ${fmt(y3)}Y + ${fmt(z3)}Z = ${fmt(n3)}`
+    });
+
+    // Paso 1: Eliminar X de E2 usando E1
+    const f21 = x2 / x1;
+    const ax2 = x2 - f21 * x1, ay2 = y2 - f21 * y1, az2 = z2 - f21 * z1, an2 = n2 - f21 * n1;
+    pasos.push({
+        titulo: `Eliminar X de E2: E2 = E2 - (${fmt(f21)}) × E1`,
+        texto: `Nueva E2: ${fmt(ax2)}X + ${fmt(ay2)}Y + ${fmt(az2)}Z = ${fmt(an2)}`
+    });
+
+    // Paso 2: Eliminar X de E3 usando E1
+    const f31 = x3 / x1;
+    const bx3 = x3 - f31 * x1, by3 = y3 - f31 * y1, bz3 = z3 - f31 * z1, bn3 = n3 - f31 * n1;
+    pasos.push({
+        titulo: `Eliminar X de E3: E3 = E3 - (${fmt(f31)}) × E1`,
+        texto: `Nueva E3: ${fmt(bx3)}X + ${fmt(by3)}Y + ${fmt(bz3)}Z = ${fmt(bn3)}`
+    });
+
+    // Ahora tenemos sistema 2x2 con Y y Z
+    // ay2·Y + az2·Z = an2
+    // by3·Y + bz3·Z = bn3
+    if (ay2 === 0 && by3 === 0) {
+        mostrarSinSolucion("No se puede continuar con eliminación (coeficientes de Y nulos).");
+        return;
+    }
+
+    // Paso 3: Eliminar Y de E3 usando nueva E2
+    let f32, cy3, cz3, cn3;
+    if (ay2 !== 0) {
+        f32 = by3 / ay2;
+        cy3 = by3 - f32 * ay2;
+        cz3 = bz3 - f32 * az2;
+        cn3 = bn3 - f32 * an2;
+        pasos.push({
+            titulo: `Eliminar Y de E3: E3 = E3 - (${fmt(f32)}) × E2`,
+            texto: `Nueva E3: ${fmt(cy3)}Y + ${fmt(cz3)}Z = ${fmt(cn3)}`
+        });
+    } else {
+        cy3 = by3; cz3 = bz3; cn3 = bn3;
+    }
+
+    if (cz3 === 0) {
+        mostrarSinSolucion("El sistema no tiene solución única (coeficiente de Z nulo).");
+        return;
+    }
+
+    // Paso 4: Despejar Z
+    const z = cn3 / cz3;
+    pasos.push({ titulo: "Despejar Z", texto: `${fmt(cz3)}Z = ${fmt(cn3)}\nZ = ${fmt(cn3)} / ${fmt(cz3)} = ${fmt(z)}` });
+
+    // Paso 5: Despejar Y
+    if (ay2 === 0) {
+        mostrarSinSolucion("No se puede despejar Y (coeficiente 0).");
+        return;
+    }
+    const y = (an2 - az2 * z) / ay2;
+    pasos.push({
+        titulo: "Sustituir Z en E2 para despejar Y",
+        texto: `${fmt(ay2)}Y + ${fmt(az2)}(${fmt(z)}) = ${fmt(an2)}\n${fmt(ay2)}Y = ${fmt(an2)} - ${fmt(az2 * z)}\nY = ${fmt(y)}`
+    });
+
+    // Paso 6: Despejar X
+    if (x1 === 0) {
+        mostrarSinSolucion("No se puede despejar X (coeficiente 0 en E1).");
+        return;
+    }
+    const x = (n1 - y1 * y - z1 * z) / x1;
+    pasos.push({
+        titulo: "Sustituir Y y Z en E1 para despejar X",
+        texto: `${fmt(x1)}X + ${fmt(y1)}(${fmt(y)}) + ${fmt(z1)}(${fmt(z)}) = ${fmt(n1)}\n${fmt(x1)}X = ${fmt(n1)} - ${fmt(y1 * y)} - ${fmt(z1 * z)}\nX = ${fmt(x)}`
+    });
+
+    mostrarPasosYResultado(pasos, { X: x, Y: y, Z: z });
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
